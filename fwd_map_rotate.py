@@ -1,30 +1,28 @@
-#First assignment : Forward map rotation
+# First assignment: Forward map (rotation)
+# Apply rotation matrix to each pixel vector [x y] to find it's new position vextor [x' y']
+# in the rotated image. Since it's a forward map, a position in output image may have been addressed
+# multiple times or not at all. Hence, overlap / 'holes' in the output image is expected.
 
 import numpy as np
 import cv2
-from numpy.linalg import inv
 import math
 
 
-image = cv2.imread('image.png')
+image = cv2.imread('/path/to/image.png')
 image = image.astype(int)
-#print(image)
-#b,g,r = cv2.split(image)
 rows,columns,ch = np.shape(image)
-#print(rows,columns)
+
 angle = 30
 theta = np.radians(angle)
 c, s = np.cos(theta), np.sin(theta)
 rotation_array = np.array(((c,-s), (s, c)))
 print(rotation_array)
-inv_rotation_array = np.linalg.inv(rotation_array)
 
 new_image = np.zeros([rows,columns,ch])
-image = image.astype(int)
 new_image = new_image.astype(int)
  
-#rotation
 
+#rotation
 for c in range(ch):
 	for px in range(rows):
 		for py in range(columns):
@@ -34,5 +32,5 @@ for c in range(ch):
 			[px_dash,py_dash]=op_vector
 			if np.logical_and(np.logical_and(np.logical_and(px_dash >= 0, px_dash < rows),py_dash >= 0 ),py_dash<columns):
 					new_image[int(px_dash),int(py_dash),c]=image[px,py,c]
-#print(new_image)
+
 cv2.imwrite('fwd_map_rotate.png',new_image)
