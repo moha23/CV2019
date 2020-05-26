@@ -1,3 +1,10 @@
+# First assignment: Backward map (affine)
+# Iterate over each pixel in output image and apply inverse transformation
+# to determine position in input image from which values are sampled.
+# Since inverse transformation can give non integer numbers, we use bilinear 
+# interpolation for sampling the value. Compared with forward mapping, there 
+# should be no 'holes' since each output pixel is accounted for.
+
 import numpy as np
 import cv2
 from numpy.linalg import inv
@@ -5,28 +12,28 @@ import math
 
 
 image = cv2.imread('image.png')
-#b,g,r = cv2.split(image)
+image = image.astype(int)
+
 rows,columns,ch = np.shape(image)
-#print(rows,columns)
 
 affine_array = np.array(((1,0.2,0), (0, 1,0),(0,0,1)))
 inv_affine_array = np.linalg.inv(affine_array)
 
 new_image = np.zeros([rows,columns,ch])
-image = image.astype(int)
 new_image = new_image.astype(int)
  
 #affine
-
 for c in range(ch):
 	for px in range(rows):
 		for py in range(columns):
+			
 			op_vector = np.array([px,py,1])
 			op_vector.shape=(3,1)
 			ip_vector = np.dot(inv_affine_array,op_vector)
 			[px_dash,py_dash,w]=ip_vector
 			px_dash=px_dash/w
 			py_dash=py_dash/w
+			
 			#bilinear interpolation
 			x = math.floor(px_dash)
 			y = math.floor(py_dash)
