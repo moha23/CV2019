@@ -1,3 +1,10 @@
+# First assignment: Backward map (rotation)
+# Iterate over each pixel in output image and apply inverse transformation
+# to determine position in input image from which values are sampled.
+# Since inverse transformation can give non integer numbers, we use bilinear 
+# interpolation for sampling the value. Compared with forward mapping, there 
+# should be no 'holes' since each output pixel is accounted for.
+
 import numpy as np
 import cv2
 from numpy.linalg import inv
@@ -5,9 +12,10 @@ import math
 
 
 image = cv2.imread('image.png')
-#b,g,r = cv2.split(image)
+image = image.astype(int)
+
 rows,columns,ch = np.shape(image)
-#print(rows,columns)
+
 angle = -20
 theta = np.radians(angle)
 c, s = np.cos(theta), np.sin(theta)
@@ -15,19 +23,18 @@ rotation_array = np.array(((c,-s), (s, c)))
 inv_rotation_array = np.linalg.inv(rotation_array)
 
 new_image = np.zeros([rows,columns,ch])
-image = image.astype(int)
 new_image = new_image.astype(int)
- 
+	
 #rotation
-
 for c in range(ch):
 	for px in range(rows):
 		for py in range(columns):
+			
 			op_vector = np.array([px,py])
 			op_vector.shape=(2,1)
 			ip_vector = np.dot(inv_rotation_array,op_vector)
 			[px_dash,py_dash]=ip_vector
-			#print(ip_vector)
+			
 			#bilinear interpolation
 			x = math.floor(px_dash)
 			y = math.floor(py_dash)
@@ -51,4 +58,5 @@ for c in range(ch):
 					new_image[px,py,c] = value
 			else:
 				new_image[px,py,c] = 0
+				
 cv2.imwrite('bwd_map_rotate.png',new_image)
